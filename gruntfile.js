@@ -149,5 +149,5 @@ module.exports = function(grunt){
     // producao
     grunt.registerTask('compila-prod', compilaDist);
     
-    // =================================================
+    // ================================================
 };
