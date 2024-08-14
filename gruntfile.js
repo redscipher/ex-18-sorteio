@@ -73,8 +73,12 @@ module.exports = function(grunt){
                 options: {
                     // necessario criar um atributo com '@@' p/ o grunt achar os padroes
                     patterns: [{
-                        match: '" href="../../build/dev/css/sass/index.css"',
+                        match: '" href="../../build/dev/css/sass/index_sass.css"',
                         replacement: '" href="./css/sass/index.min.css"'
+                    },
+                    {
+                        match: '" href="../../build/dev/css/less/index_less.css"',
+                        replacement: '" href="./css/less/index.min.css"'
                     },
                     {
                        match: '" src="../js/index.js"',
