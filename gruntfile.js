@@ -1,146 +1,149 @@
 // inicia grunt
 module.exports = function(grunt){
-    // configuracao
+    // '======================================
+
+    // importacoes tarefas
+    grunt.loadNpmTasks('grunt-contrib-less');
+    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-concurrent');
+    grunt.loadNpmTasks('grunt-contrib-htmlmin');
+    grunt.loadNpmTasks('grunt-replace');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-sass');
+    grunt.loadNpmTasks('grunt-contrib-imagemin');
+    
+    // configuracoes
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        // plugin less
         less: {
-            desenvolvimento: {
+            dev: {
                 files: {
-                    './build/dev/css/index.css': './src/less/index.less'
+                    './build/dev/css/less/index_less.css': './src/less/**/*.less'
                 }
             },
-            producao: {
-                // minifica os arquivos
-                options: {
-                    compress: true
-                },
-                files: {
-                    './build/prod/css/index.min.css': './src/less/index.less'
-                }
-            }
-        },        // plugin sass
-        sass: {
-            // desenvolvimento
-            desenvolvimento: {
-                files: {
-                    // './build/dev/css/sass/ .css': './src/sass/ .scss'
-                }
-            },
-            // producao
             dist: {
                 options: {
-                    // minifica arquivos
+                    // comprime less
+                    compress: true,
+                    sourceMap: true
+                },
+                files: {
+                    './build/dist/css/less/index_less.min.css': './src/less/**/*.less'
+                }
+            }
+        },
+        sass: {
+            dev: {
+                files: {
+                    './build/dev/css/sass/index_sass.css': './src/sass/**/*.scss'
+                }
+            },
+            dist: {
+                options: {
+                    // minifica
                     style: 'compressed'
                 },
                 files: {
-                    // './build/prod/css/sass/ .css': './src/sass/ .scss'
+                    './build/dist/css/sass/index_sass.min.css': './src/sass/**/*.scss'
                 }
             }
         },
-        // paralelos
-        concurrent: {
-            desenvolvimento: {
-                target: ['less:desenvolvimento', 'sass:desenvolvimento', 'replace:desenvolvimento']
-            },
-            producao: {
-                target: ['less:producao', 'sass:dist', 'htmlmin:dist', 'replace:dist', 'clean', 'uglify']
-            }
-        },
-        // observador
         watch: {
-            desenvolvimento: {
-                // ** => todas as pastas
-                // *.extensao / *  => todos os arquivos / da extensao
-                files: ['./src/less/**/*.less', './index.html'],
-                tasks: ['concurrent:desenvolvimento']
-            },
-            producao: {
-                // ** => todas as pastas
-                // *.extensao / *  => todos os arquivos / da extensao
-                files: ['./src/less/**/*.less', './index.html'],
-                tasks: ['concurrent:producao']
-            }
-        },
-        replace: {
-            desenvolvimento: {
+            dev: {
                 options: {
-                    patterns: [{
-                        match: 'ARQUIVO-CSS',
-                        replacement: './css/index.css'
-                    },
-                    {
-                        match: 'ARQUIVO-JS',
-                        replacement: '../../src/js/index.js'
-                    }]
+                    atBegin: true
                 },
-                files: [{
-                    expand: true,
-                    flatten: true,
-                    src: ['./index.html'],
-                    dest: './build/dev/'
-                }]
-            },
-            dist: {
-                options: {
-                    patterns: [{
-                        match: 'ARQUIVO-CSS',
-                        replacement: './css/index.min.css'
-                    },
-                    {
-                        match: 'ARQUIVO-JS',
-                        replacement: './js/index.min.js'
-                    }]
-                },
-                files: [{
-                    expand: true,
-                    flatten: true,
-                    src: ['./prebuild/min/index.html'],
-                    dest: './build/prod/'
-                }]
+                files: ['./src/less/**/*.less', './src/sass/**/*.scss', './src/html/**/*.html'],
+                tasks: ['concurrent:dev']
             }
         },
         htmlmin: {
             dist: {
                 options: {
-                    removeComments: true,
-                    collapseWhitespace: true
+                    // comprime
+                    collapseWhitespace: true,
+                    removeComments: true
                 },
-                files: {
-                    './prebuild/min/index.html': './index.html'
-                }
+                files: [{'./prebuild/index.html': './src/html/index.html'}]
             }
         },
-        clean: ['prebuild'],
+        replace: {
+            dist: {
+                options: {
+                    // necessario criar um atributo com '@@' p/ o grunt achar os padroes
+                    patterns: [{
+                        match: '" href="../../build/dev/css/sass/index.css"',
+                        replacement: '" href="./css/sass/index.min.css"'
+                    },
+                    {
+                       match: '" src="../js/index.js"',
+                       replacement: '" src="./js/index.min.js"' 
+                    },
+                    {
+                        match: '" src="../../imagens',
+                        replacement: '" src="./imagens'
+                    }]
+                },
+                files: [{
+                    expand: true,
+                    flatten: true,
+                    src: ['./prebuild/**/*.html'],
+                    dest: './build/dist'
+                }]
+            }
+        },
         uglify: {
             target: {
-                files: {
-                    './build/prod/js/index.min.js': './src/js/index.js'
-                }
+                options: {
+                    sourceMap: true
+                },
+                files: [{'./build/dist/js/index.min.js': './src/js/index.js'}]
+            }
+        },
+        clean: ['./prebuild'],
+        imagemin:{
+            dist: {
+                options:{
+                    optimizationLevel: 3,
+                    svgoPlugins: [{removeViewBox: false}]
+                },
+                files: [{
+                    expand: true,
+                    src: ['./imagens/**/*.{png,jpg,gif}'],
+                    dest: './build/dist'
+                }]
+            }
+        },
+        concurrent: {
+            dev: {
+                // 'sass:dev'
+                target: ['less:dev', 'sass:dev']
+            },
+            dist: {
+                // 'sass:dist'
+                target: ['less:dist', 'sass:dist', 'replace:dist', 'uglify', 'imagemin:dist']
             }
         }
     });
 
-    // importa plugins
-    grunt.loadNpmTasks('grunt-contrib-less');
-    grunt.loadNpmTasks('grunt-contrib-sass');
-    // tarefas paralelas
-    grunt.loadNpmTasks('grunt-concurrent');
-    // observacao
-    grunt.loadNpmTasks('grunt-contrib-watch');
-    // plugin p/ execucao condicionais css
-    grunt.loadNpmTasks('grunt-replace');
-    // minificacao html
-    grunt.loadNpmTasks('grunt-contrib-htmlmin');
-    // exclui arquivos temps
-    grunt.loadNpmTasks('grunt-contrib-clean');
-    // minificacao js
-    grunt.loadNpmTasks('grunt-contrib-uglify');
+    // funcoes
+    let compilaDist = function(){
+        try {
+            // tarefas
+            grunt.task.run('htmlmin:dist');
+            grunt.task.run('concurrent:dist');
+            grunt.task.run('clean');
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
 
-    // tarefa padrao
-    grunt.registerTask('default', ['concurrent:desenvolvimento']);
-    // demais tarefas
-    grunt.registerTask('compila-prod', ['concurrent:producao']);
-    grunt.registerTask('observa', ['watch:desenvolvimento']);
-    grunt.registerTask('observa-prod', ['watch:producao']);
+    // tarefas: padrao
+    grunt.registerTask('default', ['concurrent:dev']);
+    grunt.registerTask('observa', ['watch:dev']);
+    // producao
+    grunt.registerTask('compila-prod', compilaDist);
+    
+    // =================================================
 };

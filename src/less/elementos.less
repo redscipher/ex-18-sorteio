@@ -1,0 +1,39 @@
+@import './variaveis.less';
+
+// elementos
+h1{
+    font-family: @fonteTitulo;
+    font-size: 3em;
+}
+
+button{
+    // configs
+    margin-top: 16px;
+    padding: 16px;
+    // ----------------
+    border-radius: 8px;
+    cursor: pointer;
+    // fonte
+    font-family: @fontePrincipal;
+    font-weight: bold;
+    font-size: 1.3em;
+    // cores
+    background-color: @corFundoBotoes;
+    color: @corTextoBotoes;
+}
+
+input{
+    display: block;
+    width: 120px;
+    // --------------
+    margin: 16px auto;
+    border: none;
+    border-bottom: 6px solid @corTexto;
+    // ---------------
+    font-size: 2em;
+    // cores
+    color: @corTexto;
+    background-color: transparent;
+    // -----------------
+    text-align: center;
+}
