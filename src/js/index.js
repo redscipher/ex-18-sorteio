@@ -1,6 +1,9 @@
 // evento DOM
 document.addEventListener('DOMContentLoaded', function(){
 
+    // variavel
+    let tamGlob = [];
+
     // funcoes
     let sortearNumero = function(e){
         try {
@@ -27,7 +30,12 @@ document.addEventListener('DOMContentLoaded', function(){
     let ajustaTamanho = function(e) {
         try {
             // ajusta o tamanho dinamicamente
-            this.style.width = (this.scrollWidth + 10) + 'px';
+            let tam = this.value.length;
+            // validacao
+            if (!tamGlob.includes(tam)){
+                tamGlob.push(tam);
+                this.style.width = (this.scrollWidth + 10) + 'px';
+            }
         } catch (error) {
             console.log(error.stack);
         }
