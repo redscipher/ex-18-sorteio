@@ -1,5 +1,5 @@
 // evento DOM
-document.addEventListener('DOMContentLoaded', function(){
+$(document).ready(()=>{
 
     // variavel
     let tamGlob = [];
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function(){
             // variaveis
             let numeroMaximo, numeroAleat;
             // valores
-            numeroMaximo = document.getElementById('id-numero').value;
+            numeroMaximo = $('#id-numero').val();
             numeroAleat = Math.random() * numeroMaximo;     // retorna um numero aleatorio
             // tratamentos
             numeroMaximo = parseInt(numeroMaximo);
@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', function(){
             // valida tratamento
             if (numeroAleat <= 1) numeroAleat = 2;
             // == exibicao
-            document.getElementById('id-valor').innerText = numeroAleat;        // adiciona conteudo ao HTML
-            document.querySelector('.resultado').style.display = 'block';       // edita estilo do elementos p/ exibicao
+            $('#id-valor').text(numeroAleat);        // adiciona conteudo ao HTML
+            $('.resultado').css('display', 'block');        // adiciona display:block no elemento p/ exibicao
         } catch (error) {
             console.log(error.stack);
         }
@@ -42,6 +42,6 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     // eventos
-    document.getElementById('form-sorteador').addEventListener('submit', sortearNumero);
-    document.getElementById('id-numero').addEventListener('input', ajustaTamanho);
+    $('#form-sorteador').on('submit', sortearNumero);
+    $('#id-numero').on('input', ajustaTamanho);
 });
